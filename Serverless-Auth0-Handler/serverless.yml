@@ -1,0 +1,63 @@
+
+service: serverless-auth0-handler
+
+plugins:
+  - serverless-python-requirements
+  - serverless-dotenv-plugin
+
+custom: 
+  tableName: ${self:provider.environment.TABLE_NAME}
+
+provider:
+  name: aws
+  runtime: python3.7
+  stage: dev
+  region: us-east-1
+  environment:
+    AUTH0_CLIENT_ID: ${env:AUTH0_CLIENT_ID}
+    AUTH0_DOMAIN: ${env:AUTH0_DOMAIN}
+    AUTH0_CLIENT_SECRET: ${env:AUTH0_CLIENT_SECRET}
+    AUTH0_CALLBACK_URL: ${env:AUTH0_CALLBACK_URL}
+    TABLE_NAME: ${env:TABLE_NAME}
+    REGION_NAME: 'us-east-1'
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
+  
+
+functions:
+  auth0_handler:
+    handler: src/handler.index
+    events:
+      - http:
+          path: callback
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    UsersDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: sk
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName}

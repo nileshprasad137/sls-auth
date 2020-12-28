@@ -1,0 +1,19 @@
+{
+  "name": "serverless-s3",
+  "version": "1.0.0",
+  "description": "A trial version of serverless-s3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/your_id/repo_name.git"
+  },
+  "devDependencies": {
+    "serverless-offline": "^5.12.0",
+    "serverless-python-requirements": "^4.3.0"
+  }
+}
