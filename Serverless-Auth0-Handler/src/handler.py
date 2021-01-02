@@ -63,6 +63,7 @@ class Auth0:
         response = cls.conn.getresponse()
         data = response.read()
         results = json.loads(data.decode("utf-8"))
+        print(results)
         return results
 
 
@@ -117,7 +118,16 @@ def index(event: dict, context):
         return return_failure({"status": False, "msg": msg})
 
     user_profile = Auth0.get_user_profile(param['code'])
+    print(user_profile)
     item, created = Profile.get_or_create(user_profile)
     # TODO: You will need to redirect customers to a specific url here.
     return return_success({
         "status": True, "created?": created, "data": item})
+
+def handle_implicit_login(event: dict, context):
+    param = event.get('queryStringParameters', None)
+    body = event.get('body')
+    print(param)
+    print(body)
+    return return_success({
+        "status": True, "created?": "kuch toh hua"})

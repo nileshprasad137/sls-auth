@@ -43,6 +43,13 @@ functions:
           path: callback
           method: get
           cors: true
+  implicit_login_handler:
+    handler: src/handler.handle_implicit_login
+    events:
+      - http:
+          path: implicit_login_handler
+          method: post
+          cors: true
 
 resources:
   Resources:
