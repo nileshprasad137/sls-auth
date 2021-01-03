@@ -36,8 +36,8 @@ provider:
   
 
 functions:
-  auth0_handler:
-    handler: src/handler.index
+  auth_code_login_handler:
+    handler: src/handler.handle_auth_code_login
     events:
       - http:
           path: callback
