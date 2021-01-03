@@ -50,6 +50,8 @@ class Auth0:
         """Getting User Profile
         """
         token = cls.get_access_token(code)
+        # Now that we have received access_token and id_token, we can use it to call /userinfo
+        # for fetching user info. This is OpenID standard for fetching user info;
         return Auth0.get_user_info(token)
 
     @classmethod
@@ -124,7 +126,7 @@ def handle_auth_code_login(event: dict, context):
         'code' here is authorisation code sent by authorisation server.
          In our case, authorisation server is Auth0 since we are using it as auth service.
          However, we  again need to exchange this authorisation code
-         with access_token which is what happens below.
+         with access_token which is what happens below. We need access_token for hitting service endpoints.
     """
     if param is None or param.get('code') is None:
         msg = "Invalid Request. \'code\' is not found in queryStringParameters."
