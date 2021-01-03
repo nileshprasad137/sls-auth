@@ -3,6 +3,7 @@ import json
 import boto3
 import http.client, urllib.parse
 from typing import Tuple
+import urllib.parse
 from src.response import return_success, return_failure
 
 
@@ -56,6 +57,31 @@ class Auth0:
 
         headers = {
             'Authorization': 'Bearer {}'.format(token.get('access_token')),
+            'Content-Type': 'application/json'
+        }
+
+        cls.conn.request("GET", "/userinfo", body, headers)
+        response = cls.conn.getresponse()
+        data = response.read()
+        results = json.loads(data.decode("utf-8"))
+        print(results)
+        return results
+
+    @classmethod
+    def get_user_profile_from_user_info(cls, tokens: dict) -> dict:
+        """Getting User Profile
+        """
+        print("token is below")
+        print(tokens)
+        if tokens.get('id_token') is None and tokens.get('access_token') is None:
+            return None
+
+        body = json.dumps({
+            'id_token': tokens.get('id_token')[0]
+        })
+
+        headers = {
+            'Authorization': 'Bearer {}'.format(tokens.get('access_token')[0]),
             'Content-Type': 'application/json'
         }
 
@@ -125,9 +151,30 @@ def index(event: dict, context):
         "status": True, "created?": created, "data": item})
 
 def handle_implicit_login(event: dict, context):
-    param = event.get('queryStringParameters', None)
+    # print(json.dumps(event))
+    # param = event.get('queryStringParameters', None)
     body = event.get('body')
-    print(param)
-    print(body)
+    tokens = urllib.parse.parse_qs(body)
+    print(tokens)
+    user_profile = Auth0.get_user_profile_from_user_info(tokens)
+
+    # print("body --> " , body)
+    # id_token = body.split("=")[1]
+    # print("id_token ---> ", id_token)
+    # body = json.dumps({
+    #     'id_token': id_token
+    # })
+    #
+    # headers = {
+    #     'Authorization': 'Bearer {}'.format(token.get('access_token')),
+    #     'Content-Type': 'application/json'
+    # }
+    #
+    # cls.conn.request("GET", "/userinfo", body, headers)
+    # response = cls.conn.getresponse()
+    # data = response.read()
+    # results = json.loads(data.decode("utf-8"))
+    # print(results)
+    # user_profile = Auth0.get_user_profile(id_token)
     return return_success({
-        "status": True, "created?": "kuch toh hua"})
+        "status": True, "user_profile": user_profile})
